@@ -1,45 +1,39 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
 import { createSearchCommand } from './commands/search.js';
 import { createSearchUsersCommand } from './commands/searchUsers.js';
 import { createUserTweetsCommand } from './commands/userTweets.js';
 import { createTweetCommand } from './commands/tweet.js';
+import { createSearchTopicsCommand } from './commands/searchTopics.js';
+import { createTopicCommand } from './commands/topic.js';
+import { createConfigCommand } from './commands/config.js';
 
-const version = '1.0.0';
+// Get package.json version
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const packageJson = JSON.parse(
+  readFileSync(join(__dirname, '..', 'package.json'), 'utf-8')
+);
 
-// Create CLI program
-const program = new Command()
+const program = new Command();
+
+program
   .name('x-cli')
-  .description('CLI tool for X (Twitter) API - search tweets, users, and more')
-  .version(version);
+  .description('X (Twitter) CLI 工具')
+  .version(packageJson.version);
 
 // Add commands
 program.addCommand(createSearchCommand());
 program.addCommand(createSearchUsersCommand());
 program.addCommand(createUserTweetsCommand());
 program.addCommand(createTweetCommand());
+program.addCommand(createSearchTopicsCommand());
+program.addCommand(createTopicCommand());
+program.addCommand(createConfigCommand());
 
-// Add global help
-program.on('--help', () => {
-  console.log('');
-  console.log('Examples:');
-  console.log('  $ x-cli search "typescript"');
-  console.log('  $ x-cli search-users "elonmusk"');
-  console.log('  $ x-cli user-tweets "x" --max-results 20');
-  console.log('  $ x-cli tweet "1234567890" --include-author');
-  console.log('');
-  console.log('Configuration:');
-  console.log('  Set your X API token in one of the following ways:');
-  console.log('    1. Create ~/.x-cli.json: {"token": "YOUR_TOKEN"}');
-  console.log('    2. Put your token in ~/my/x-token.txt');
-  console.log('');
-});
-
-// Parse arguments
 program.parse();
-
-// Show help if no command provided
-if (!process.argv.slice(2).length) {
-  program.outputHelp();
-}

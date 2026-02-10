@@ -1,4 +1,4 @@
-import { Tweet, User, TweetPublicMetrics, UserPublicMetrics } from '../api/types.js';
+import { Tweet, User, Topic, TweetPublicMetrics, UserPublicMetrics } from '../api/types.js';
 
 export type OutputFormat = 'table' | 'json';
 
@@ -34,6 +34,54 @@ export function formatTweetMetrics(metrics?: TweetPublicMetrics): string {
 export function formatUserMetrics(metrics?: UserPublicMetrics): string {
   if (!metrics) return '';
   return `👥 ${metrics.followers_count} followers | ${metrics.following_count} following | 📝 ${metrics.tweet_count} tweets`;
+}
+
+/**
+ * 格式化话题/主题
+ */
+export function formatTopic(topic: Topic, index?: number): string {
+  const lines = [];
+  
+  // 索引前缀
+  const prefix = index !== undefined ? `[${index}] ` : '';
+  
+  // 话题名称
+  lines.push(`${prefix}📌 ${topic.name}`);
+  
+  // ID
+  lines.push(`   ID: ${topic.id}`);
+  
+  // 描述
+  if (topic.description) {
+    lines.push('   ─'.repeat(20));
+    lines.push(`   ${topic.description}`);
+    lines.push('   ─'.repeat(20));
+  }
+  
+  // 关注数
+  if (topic.follower_count !== undefined) {
+    lines.push(`   👥 ${topic.follower_count.toLocaleString()} followers`);
+  }
+  
+  // 查询字符串
+  if (topic.query) {
+    lines.push(`   🔍 Query: "${topic.query}"`);
+  }
+  
+  return lines.join('\n');
+}
+
+/**
+ * 格式化话题列表
+ */
+export function formatTopicList(topics: Topic[]): string {
+  if (topics.length === 0) {
+    return 'No topics found.';
+  }
+
+  return topics
+    .map((topic, index) => formatTopic(topic, index + 1))
+    .join('\n\n' + '='.repeat(50) + '\n\n');
 }
 
 /**

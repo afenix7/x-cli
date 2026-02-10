@@ -9,6 +9,11 @@ import {
   GetUserTweetsOptions,
   GetTweetOptions,
   GetUserOptions,
+  SearchTopicsOptions,
+  GetTopicTweetsOptions,
+  TopicsResponse,
+  TopicResponse,
+  TweetsResponse as TopicTweetsResponse,
   ApiError,
 } from './types.js';
 
@@ -173,6 +178,77 @@ export class XApiClient {
     }
 
     return this.request<TweetResponse>(`/tweets/${tweetId}`, params);
+  }
+
+  /**
+   * 搜索话题/主题
+   * @param query 搜索关键词
+   * @param options 可选参数
+   */
+  async searchTopics(query: string, options: SearchTopicsOptions = {}): Promise<TopicsResponse> {
+    const params: Record<string, any> = {
+      query,
+      max_results: options.maxResults || 10,
+    };
+
+    if (options.topicFields) {
+      params['topic.fields'] = options.topicFields.join(',');
+    }
+    if (options.expansions) {
+      params['expansions'] = options.expansions.join(',');
+    }
+    if (options.tweetFields) {
+      params['tweet.fields'] = options.tweetFields.join(',');
+    }
+
+    return this.request<TopicsResponse>('/topics/search', params);
+  }
+
+  /**
+   * 获取话题详情
+   * @param topicId 话题 ID
+   * @param options 可选参数
+   */
+  async getTopic(topicId: string, options: SearchTopicsOptions = {}): Promise<TopicResponse> {
+    const params: Record<string, any> = {};
+
+    if (options.topicFields) {
+      params['topic.fields'] = options.topicFields.join(',');
+    }
+    if (options.expansions) {
+      params['expansions'] = options.expansions.join(',');
+    }
+    if (options.tweetFields) {
+      params['tweet.fields'] = options.tweetFields.join(',');
+    }
+
+    return this.request<TopicResponse>(`/topics/${topicId}`, params);
+  }
+
+  /**
+   * 获取话题下的推文
+   * @param topicId 话题 ID
+   * @param options 可选参数
+   */
+  async getTopicTweets(topicId: string, options: GetTopicTweetsOptions = {}): Promise<TweetsResponse> {
+    const params: Record<string, any> = {
+      max_results: options.maxResults || 10,
+    };
+
+    if (options.tweetFields) {
+      params['tweet.fields'] = options.tweetFields.join(',');
+    }
+    if (options.expansions) {
+      params['expansions'] = options.expansions.join(',');
+    }
+    if (options.userFields) {
+      params['user.fields'] = options.userFields.join(',');
+    }
+    if (options.nextToken) {
+      params['pagination_token'] = options.nextToken;
+    }
+
+    return this.request<TweetsResponse>(`/topics/${topicId}/tweets`, params);
   }
 }
 

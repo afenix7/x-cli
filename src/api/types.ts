@@ -164,3 +164,45 @@ export interface GetUserOptions {
   expansions?: string[];
   tweetFields?: string[];
 }
+
+// Topic related types
+export interface Topic {
+  id: string;
+  name: string;
+  description?: string;
+  query?: string;
+  pinned_tweet_id?: string;
+  created_at?: string;
+}
+
+export interface TopicResponse {
+  data: Topic;
+  includes?: {
+    tweets?: Tweet[];
+  };
+  errors?: ApiError[];
+}
+
+export interface TopicsResponse {
+  data: Topic[];
+  meta: {
+    result_count: number;
+  };
+  errors?: ApiError[];
+}
+
+// Topic search options
+export interface SearchTopicsOptions {
+  maxResults?: number; // 1-100
+  topicFields?: string[];
+  expansions?: string[];
+  tweetFields?: string[];
+}
+
+export interface GetTopicTweetsOptions {
+  maxResults?: number; // 10-100
+  tweetFields?: string[];
+  expansions?: string[];
+  userFields?: string[];
+  nextToken?: string;
+}
